@@ -122,3 +122,7 @@ runs:
       shell: bash
       run: | 
         sudo rsync -alHh --inplace ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks /usr/local/opt/__theos_sdks_cache/
+
+branding:
+  icon: download-cloud
+  color: purple
