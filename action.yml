@@ -55,6 +55,8 @@ runs:
         echo "::set-output name=theos::`git ls-remote https://github.com/theos/theos | grep "${{ inputs.theos-branch }}" | head -n 1 | cut -f 1`"
         echo "::set-output name=theos-sdks::`git ls-remote https://github.com/theos/sdks | grep "${{ inputs.theos-sdks-branch }}" | head -n 1 | cut -f 1`"
         echo "::set-output name=theos-dir-basename::`basename ${{ github.workspace }}/${{ inputs.theos-dir }}`"
+        
+        sudo mkdir -p /usr/local/opt/__theos_cache /usr/local/opt/__theos_sdks_cache/sdks
 
     - name: Set up Theos cache
       uses: actions/cache@v3
