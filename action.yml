@@ -1,0 +1,111 @@
+name: 'Set up Theos'
+description: 'Set up Theos for building projects in workflows'
+author: 'Nebula'
+inputs:
+  theos-dir:
+    description: 'Where to install Theos'
+    required: false
+    default: theos
+  theos-src:
+    description: 'Where to clone Theos itself from (git URL)'
+    required: false
+    default: 'https://github.com/theos/theos'
+  theos-branch:
+    description: 'Branch of Theos to clone'
+    required: false
+    default: 'master'
+  theos-sdks:
+    description: 'Where to clone the iOS SDKs from (git URL)'
+    required: false
+    default: 'https://github.com/theos/sdks'
+  theos-sdks-branch:
+    description: 'Branch of Theos sdks to clone'
+    required: false
+    default: 'master'
+  procursus-mirror:
+    description: 'Mirror of Procursus to use (on macOS)'
+    required: false
+    default: 'https://procursus.itsnebula.net/'
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Procursus
+      uses: beerpiss/procursus-action@v2.0.1
+      if: runner.os == 'macOS'
+      with:
+        packages: ldid make
+        cache: true
+        cache-path: ~/__cache
+        mirror: '${{ inputs.procursus-mirror }}'
+    
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        curl -LO https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus6/ldid_linux_x86_64 -o ldid
+        chmod +x ldid
+        sudo mv ldid /usr/bin/ldid
+        sudo ln -s /usr/bin/make /usr/bin/gmake
+        
+    - name: Prepare environment
+      id: information
+      shell: bash
+      run: |
+        echo "THEOS=${{ github.workspace }}/${{ inputs.theos-dir }}" >> $GITHUB_ENV
+        
+        echo "::set-output name=theos::`git ls-remote https://github.com/theos/theos | grep "${{ inputs.theos-branch }}" | head -n 1 | cut -f 1`"
+        echo "::set-output name=theos-sdks::`git ls-remote https://github.com/theos/sdks | grep "${{ inputs.theos-sdks-branch }}" | head -n 1 | cut -f 1`"
+        echo "::set-output name=theos-dir-basename::`basename ${{ github.workspace }}/${{ inputs.theos-dir }}`"
+
+    - name: Set up Theos cache
+      uses: actions/cache@v3
+      id: theos-cache
+      with:
+        path: /usr/local/opt/__theos_cache
+        key: ${{ steps.information.outputs.theos }}-theos2
+
+    - name: Get Theos (uncached)
+      if: steps.theos-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        rm -rf ${{ github.workspace }}/${{ inputs.theos-dir }}
+        git clone --recursive ${{ inputs.theos-src }} ${{ github.workspace }}/${{ inputs.theos-dir }}
+        cd ${{ github.workspace }}/${{ inputs.theos-dir }}
+        git -C ${{ github.workspace }}/${{ inputs.theos-dir }} checkout ${{ inputs.theos-branch }}
+        
+    - name: Restore Theos from cache
+      if: steps.theos-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        sudo rsync -aWlHh --inplace /usr/local/opt/__theos_cache/${{ steps.information.outputs.theos-dir-basename }}/ ${{ github.workspace }}/${{ inputs.theos-dir }}
+
+    - name: Cache Theos
+      if: steps.theos-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        sudo rsync -alHh --inplace ${{ github.workspace }}/${{ inputs.theos-dir }} /usr/local/opt/__theos_cache/
+
+    - uses: actions/cache@v3
+      id: theos-sdks-cache
+      with:
+        path: /usr/local/opt/__theos_sdks_cache
+        key: ${{ steps.information.outputs.theos-sdks }}-theos
+
+    - name: Get Theos SDKs (uncached)
+      if: steps.theos-sdks-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        rm -rf ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks/* 
+        curl -sL ${{ inputs.theos-sdks }}/archive/${{ inputs.theos-sdks-branch }}.tar.gz | tar -xzf - --strip-components=1 -C ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks
+
+    - name: Restore Theos SDKs from cache
+      if: steps.theos-sdks-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        sudo rsync -aWlHh --inplace /usr/local/opt/__theos_sdks_cache/sdks ${{ github.workspace }}/${{ inputs.theos-dir }}
+
+    - name: Cache Theos SDKs
+      if: steps.theos-sdks-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: | 
+        sudo rsync -alHh --inplace ${{ github.workspace }}/${{ inputs.theos-dir }}/sdks /usr/local/opt/__theos_sdks_cache/
