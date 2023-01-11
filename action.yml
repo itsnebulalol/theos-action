@@ -45,7 +45,6 @@ runs:
         curl -L https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus6/ldid_linux_x86_64 -o ldid
         chmod +x ldid
         sudo mv ldid /usr/bin/ldid
-        sudo ln -s /usr/bin/make /usr/bin/gmake
         
     - name: Prepare environment
       id: information
