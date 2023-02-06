@@ -30,7 +30,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up Procursus
-      uses: beerpiss/procursus-action@v2.0.1
+      uses: itsnebulalol/procursus-action@patch-2
       if: runner.os == 'macOS'
       with:
         packages: ldid make
