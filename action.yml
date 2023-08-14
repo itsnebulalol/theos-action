@@ -56,6 +56,7 @@ runs:
         git clone --recursive ${{ inputs.theos-src }} ${{ github.workspace }}/${{ inputs.theos-dir }} -b ${{ inputs.theos-branch }}
         cd ${{ github.workspace }}/${{ inputs.theos-dir }}
 
+        echo "https://api.github.com/repos/${{ inputs.theos-sdks }}/tarball"
         curl -L https://api.github.com/repos/${{ inputs.theos-sdks }}/tarball -o sdks.tar.gz
         TMP=$(mktemp -d)
         tar -xvf sdks.tar.gz --strip=1 -C $TMP
