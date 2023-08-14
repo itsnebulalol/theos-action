@@ -59,7 +59,7 @@ runs:
         rm -rf ${{ github.workspace }}/${{ inputs.theos-dir }}
         git clone --recursive ${{ inputs.theos-src }} ${{ github.workspace }}/${{ inputs.theos-dir }} -b ${{ inputs.theos-branch }}
         cd ${{ github.workspace }}/${{ inputs.theos-dir }}
-        git clone ${{ inputs.theos-sdks }} ${{ github.workspace }}/${{ inputs.theos-sdks-dir }}/sdks -b ${{ inputs.theos-branch }}
+        git clone ${{ inputs.theos-sdks }} ${{ github.workspace }}/${{ inputs.theos-sdks-dir }}/sdks -b ${{ inputs.theos-sdks-branch }}
         
         if [ "$RUNNER_OS" == "Linux" ]; then
             curl -LO https://github.com/CRKatri/llvm-project/releases/download/swift-5.3.2-RELEASE/swift-5.3.2-RELEASE-ubuntu20.04.tar.zst
