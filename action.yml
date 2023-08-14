@@ -15,9 +15,9 @@ inputs:
     required: false
     default: 'master'
   theos-sdks:
-    description: 'Where to clone the iOS SDKs from (git URL)'
+    description: 'Where to clone the iOS SDKs from (github repo without github.com)'
     required: false
-    default: 'https://github.com/itsnebulalol/sdks'
+    default: 'itsnebulalol/sdks'
   procursus-mirror:
     description: 'Mirror of Procursus to use (on macOS)'
     required: false
