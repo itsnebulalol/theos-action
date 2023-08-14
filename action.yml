@@ -96,7 +96,7 @@ runs:
         sudo rsync -alHh --inplace ${{ github.workspace }}/${{ inputs.theos-dir }} /usr/local/opt/__theos_cache/
 
     - name: Set up Theos SDKs cache
-     uses: actions/cache@v3
+      uses: actions/cache@v3
       id: theos-sdks-cache
       with:
         path: /usr/local/opt/__theos_sdks_cache
