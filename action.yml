@@ -21,7 +21,7 @@ inputs:
   theos-sdks-branch:
     description: 'Branch of Theos sdks to clone'
     required: false
-    default: 'master'
+    default: 'main'
   procursus-mirror:
     description: 'Mirror of Procursus to use (on macOS)'
     required: false
