@@ -31,9 +31,6 @@ jobs:
           
       - name: Run Theos action
         uses: itsnebulalol/theos-action@main
-        with:
-          theos-sdks: "https://github.com/chrisharper22/sdks"
-          theos-sdks-branch: "main"
       
       - name: Build tweak
         run: make clean package FINALPACKAGE=1
